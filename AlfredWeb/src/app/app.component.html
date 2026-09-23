@@ -1,0 +1,22 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">AI</div><div><strong>Assessor IA</strong><span>Finanças simples</span></div></div>
+    <div class="summary"><span>Hoje</span><strong>Registre entradas e saídas conversando.</strong><p>O MVP mantém apenas a interface de chat e áudio.</p></div>
+  </aside>
+  <main class="chat">
+    <header><div><h1>Assistente financeiro</h1><p>Conte o que entrou ou saiu do caixa.</p></div><span class="status">● Online</span></header>
+    <section class="history">
+      <div *ngFor="let message of messages" class="message" [class.user]="message.role === 'user'">
+        <div class="bubble"><p>{{message.text}}</p><small>{{message.time}}</small></div>
+      </div>
+    </section>
+    <footer>
+      <div class="composer">
+        <button class="mic" [class.recording]="recording" (click)="toggleRecording()" [attr.aria-label]="recording ? 'Parar gravação' : 'Gravar áudio'">{{recording ? '■' : '●'}}</button>
+        <input [(ngModel)]="text" (keyup.enter)="send()" placeholder="Ex.: Recebi R$ 850 da Maria pelo pedido..." />
+        <button class="send" (click)="send()">Enviar</button>
+      </div>
+      <small class="hint">{{recording ? 'Gravando… clique novamente para finalizar.' : 'Use texto ou toque no microfone para registrar por áudio.'}}</small>
+    </footer>
+  </main>
+</div>
