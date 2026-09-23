@@ -12,11 +12,11 @@
     </section>
     <footer>
       <div class="composer">
-        <button class="mic" [class.recording]="recording" (click)="toggleRecording()" [attr.aria-label]="recording ? 'Parar gravação' : 'Gravar áudio'">{{recording ? '■' : '●'}}</button>
+        <button class="mic" [class.recording]="isRecording" (click)="recordAudio()" [attr.aria-label]="isRecording ? 'Parar gravação' : 'Gravar áudio'">{{isRecording  ? '■' : '●'}}</button>
         <input [(ngModel)]="text" (keyup.enter)="send()" placeholder="Ex.: Recebi R$ 850 da Maria pelo pedido..." />
         <button class="send" (click)="send()">Enviar</button>
       </div>
-      <small class="hint">{{recording ? 'Gravando… clique novamente para finalizar.' : 'Use texto ou toque no microfone para registrar por áudio.'}}</small>
+      <small class="hint">{{isRecording ? 'Gravando… clique novamente para finalizar.' : 'Use texto ou toque no microfone para registrar por áudio.'}}</small>
     </footer>
   </main>
 </div>
