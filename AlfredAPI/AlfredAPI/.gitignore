@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+.env
+
+# Local Whisper model weights
+Models/Whisper/*.bin
