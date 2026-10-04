@@ -3,45 +3,69 @@ using Whisper.net;
 
 namespace AlfredAPI.Services;
 
-public class TranscriptionService : ITranscriptionService
+public class TranscriptionService : ITranscriptionService, IDisposable
 {
-    private readonly string _modelPath;
+    private readonly WhisperFactory _whisperFactory;
+    private readonly string _language;
 
-    public TranscriptionService(IWebHostEnvironment environment)
+    public TranscriptionService(
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
-        _modelPath = Path.Combine(
+        var relativeModelPath =
+            configuration["Whisper:ModelPath"]
+            ?? throw new InvalidOperationException(
+                "Whisper model path is not configured.");
+
+        _language =
+            configuration["Whisper:Language"]
+            ?? "pt";
+
+        var modelPath = Path.Combine(
             environment.ContentRootPath,
-            "Models",
-            "Whisper",
-            "ggml-small.bin");
+            relativeModelPath);
+
+        if (!File.Exists(modelPath))
+        {
+            throw new FileNotFoundException(
+                $"Whisper model not found at: {modelPath}");
+        }
+
+        _whisperFactory = WhisperFactory.FromPath(modelPath);
     }
 
     public async Task<string> TranscribeAsync(
         IFormFile audio,
         CancellationToken cancellationToken = default)
     {
-        if (!File.Exists(_modelPath))
+        if (audio is null || audio.Length == 0)
         {
-            throw new FileNotFoundException(
-                $"Whisper model not found at '{_modelPath}'. " +
-                "Place ggml-small.bin in Models/Whisper before running transcription.");
+            throw new ArgumentException(
+                "Audio file cannot be empty.",
+                nameof(audio));
         }
 
-        using var whisperFactory = WhisperFactory.FromPath(_modelPath);
-        using var processor = whisperFactory
+        using var processor = _whisperFactory
             .CreateBuilder()
-            .WithLanguage("pt")
+            .WithLanguage(_language)
             .Build();
 
         await using var audioStream = audio.OpenReadStream();
+
         var transcription = new StringBuilder();
 
-        await foreach (var segment in processor.ProcessAsync(audioStream))
+        await foreach (var segment in processor.ProcessAsync(
+            audioStream,
+            cancellationToken))
         {
-            cancellationToken.ThrowIfCancellationRequested();
             transcription.Append(segment.Text);
         }
 
         return transcription.ToString().Trim();
+    }
+
+    public void Dispose()
+    {
+        _whisperFactory.Dispose();
     }
 }
