@@ -2,5 +2,7 @@ namespace AlfredAPI.Services;
 
 public interface ITranscriptionService
 {
-    Task<string> TranscribeAsync(IFormFile audio, CancellationToken cancellationToken = default);
+    Task<string> TranscribeAsync(
+        Stream audioStream,
+        CancellationToken cancellationToken = default);
 }

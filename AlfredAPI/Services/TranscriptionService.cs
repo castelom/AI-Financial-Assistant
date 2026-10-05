@@ -35,22 +35,18 @@ public class TranscriptionService : ITranscriptionService, IDisposable
     }
 
     public async Task<string> TranscribeAsync(
-        IFormFile audio,
-        CancellationToken cancellationToken = default)
+    Stream audioStream,
+    CancellationToken cancellationToken = default)
     {
-        if (audio is null || audio.Length == 0)
+        if (audioStream is null)
         {
-            throw new ArgumentException(
-                "Audio file cannot be empty.",
-                nameof(audio));
+            throw new ArgumentNullException(nameof(audioStream));
         }
 
         using var processor = _whisperFactory
             .CreateBuilder()
             .WithLanguage(_language)
             .Build();
-
-        await using var audioStream = audio.OpenReadStream();
 
         var transcription = new StringBuilder();
 

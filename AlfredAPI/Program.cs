@@ -9,6 +9,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IAudioConversionService,AudioConversionService>();
 builder.Services.AddScoped<ITranscriptionService, TranscriptionService>();
 
 builder.Services.AddCors(options =>
